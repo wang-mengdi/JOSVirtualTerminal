@@ -51,25 +51,48 @@ delay(void)
 /***** VGA ports *****/
 #define GC_ADDR_PORT 0x3CE
 #define GC_DATA_PORT 0x3CF
+#define SEQ_ADDR_PORT 0x3C4
+#define SEQ_DATA_PORT 0x3C5
 #define ATTR_ADDR_DATA_PORT 0x3C0
 #define ATTR_DATA_READ_PORT 0x3C1
+#define EXT_MISC_READ 0x3CC
+#define EXT_MISC_WRITE 0x3C2
+#define VGA_WIDTH 640
+#define VGA_HEIGHT 400
+#define VGA_SIZE (VGA_WIDTH*VGA_HEIGHT)
 
-uint8_t read_gc_register(uint8_t idx){
-    uint8_t tmp = inb(GC_ADDR_PORT);
-    outb(GC_ADDR_PORT, idx);
-    uint8_t ret = inb(GC_DATA_PORT);
-    outb(GC_ADDR_PORT, tmp);
+uint8_t read_universal_register(int addr_port, int data_port, uint8_t idx){
+    uint8_t tmp = inb(addr_port);
+    outb(addr_port, idx);
+    uint8_t ret = inb(data_port);
+    outb(addr_port, tmp);
     return ret;
 }
 
-void set_gc_register(uint8_t idx, uint8_t mask, uint8_t data){
-    uint8_t tmp = inb(GC_ADDR_PORT);
+void set_universal_register(int addr_port, int data_port, uint8_t idx, uint8_t mask, uint8_t data){
+    uint8_t tmp = inb(addr_port);
     outb(GC_ADDR_PORT, idx);
-    uint8_t val = inb(GC_DATA_PORT);
+    uint8_t val = inb(data_port);
     val &= ~mask;
     val |= (data&mask);
-    outb(GC_DATA_PORT, val);
-    outb(GC_ADDR_PORT, tmp);
+    outb(data_port, val);
+    outb(addr_port, tmp);
+}
+
+uint8_t read_gc_register(uint8_t idx){
+    return read_universal_register(GC_ADDR_PORT,GC_DATA_PORT,idx);
+}
+
+uint8_t read_seq_register(uint8_t idx){
+    return read_universal_register(SEQ_ADDR_PORT,SEQ_DATA_PORT,idx);
+}
+
+void set_gc_register(uint8_t idx, uint8_t mask, uint8_t data){
+    set_universal_register(GC_ADDR_PORT,GC_DATA_PORT,idx,mask,data);
+}
+
+void set_seq_register(uint8_t idx, uint8_t mask, uint8_t data){
+    set_universal_register(SEQ_ADDR_PORT,SEQ_DATA_PORT,idx,mask,data);
 }
 
 static bool serial_exists;
@@ -159,6 +182,8 @@ static unsigned addr_6845;
 static uint16_t *crt_buf;
 static uint16_t crt_pos;
 
+static uint8_t *vga_buf;
+
 static void
 cga_init(void)
 {
@@ -186,8 +211,18 @@ cga_init(void)
 	crt_buf = (uint16_t*) cp;
 	crt_pos = pos;
 
+    vga_buf = (uint8_t*)crt_buf;
+
     //////////////////////////////////////////////////////////////
     set_gc_register(0x6,0x1,0x1);
+    outb(EXT_MISC_WRITE,0x0);
+
+    set_seq_register(0x2,0xf,0xf);
+    set_seq_register(0x4,0x8,0x8);
+
+    for(int i=0;i<VGA_SIZE+1;i++){
+        vga_buf[i]=0xff;
+    }
 }
 
 
@@ -348,9 +383,10 @@ static uint8_t *charcode[4] = {
 static int
 kbd_proc_data(void)
 {
-        cprintf("==================\n");
-        cprintf("%x\n",read_gc_register(0x6));
-
+    for(int i=0;i<VGA_SIZE+1;i++){
+        vga_buf[i]=0x00;
+    }
+    return 0;
 	int c;
 	uint8_t stat, data;
 	static uint32_t shift;

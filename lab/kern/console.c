@@ -49,6 +49,9 @@ delay(void)
 
 
 /***** VGA ports *****/
+
+#define VGA_GRAPHIC_BUF 0xA000
+
 #define GC_ADDR_PORT 0x3CE
 #define GC_DATA_PORT 0x3CF
 #define SEQ_ADDR_PORT 0x3C4
@@ -191,7 +194,8 @@ cga_init(void)
 	uint16_t was;
 	unsigned pos;
 
-	cp = (uint16_t*) (KERNBASE + CGA_BUF);
+	//cp = (uint16_t*) (KERNBASE + CGA_BUF);
+    cp = (uint16_t*) (KERNBASE + VGA_GRAPHIC_BUF);
 	was = *cp;
 	*cp = (uint16_t) 0xA55A;
 	if (*cp != 0xA55A) {
@@ -230,6 +234,7 @@ cga_init(void)
 static void
 cga_putc(int c)
 {
+        return;
 	// if no attribute given, then use black on white
 	if (!(c & ~0xFF))
 		c |= 0x0700;
@@ -384,8 +389,9 @@ static int
 kbd_proc_data(void)
 {
     for(int i=0;i<VGA_SIZE+1;i++){
-        vga_buf[i]=0x00;
+        vga_buf[i]=0xff;
     }
+    cprintf("===\n");
     return 0;
 	int c;
 	uint8_t stat, data;

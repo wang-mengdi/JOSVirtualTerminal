@@ -216,6 +216,7 @@ cga_init(void)
 	crt_pos = pos;
 
     vga_buf = (uint8_t*)crt_buf;
+    crt_buf = NULL;
 
     //////////////////////////////////////////////////////////////
     set_gc_register(0x6,0x1,0x1);
@@ -388,10 +389,12 @@ static uint8_t *charcode[4] = {
 static int
 kbd_proc_data(void)
 {
-    for(int i=0;i<VGA_SIZE+1;i++){
-        vga_buf[i]=0xff;
+        uint8_t *low = (uint8_t*)(KERNBASE+0xa000);
+        uint8_t *high = (uint8_t*)(KERNBASE+0xc000);
+    for(uint8_t *p=low;p<high;p++){
+        *p=0x0;
     }
-    cprintf("===\n");
+    //cprintf("%x\n",vga_buf+VGA_SIZE);
     return 0;
 	int c;
 	uint8_t stat, data;

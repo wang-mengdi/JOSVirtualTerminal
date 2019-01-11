@@ -223,7 +223,8 @@ cga_init(void)
     outb(EXT_MISC_WRITE,0x0);
 
     //set_seq_register(0x2,0xf,0xf);
-    //set_seq_register(0x4,0x8,0x8);
+    //open chain 4 mode
+    set_seq_register(0x4,0x8,0x8);
 
     for(int i=0;i<VGA_SIZE+1;i++){
         vga_buf[i]=0xff;
@@ -235,7 +236,7 @@ cga_init(void)
 static void
 cga_putc(int c)
 {
-    //    return;
+        return;
 	// if no attribute given, then use black on white
 	if (!(c & ~0xFF))
 		c |= 0x0700;
@@ -386,15 +387,19 @@ static uint8_t *charcode[4] = {
  * Get data from the keyboard.  If we finish a character, return it.  Else 0.
  * Return -1 if no data.
  */
+int flg=0;
 static int
 kbd_proc_data(void)
 {
         uint8_t *low = (uint8_t*)(KERNBASE+0xa0000);
         uint8_t *high = (uint8_t*)(KERNBASE+0xc0000);
-    for(uint8_t *p=low;p<high;p+=2){
-        *p=0x0f;
-        *(p+1)=0xce;
+            flg^=1;
+    for(uint8_t *p=low+640*155;p<(low+640*199);p++){
+            if(flg) *p=0xff;
+            else *p=0;
     }
+    cprintf("%x\n",flg);
+    cprintf("%x\n",*high);
     //cprintf("%x\n",vga_buf+VGA_SIZE);
     return 0;
 	int c;

@@ -226,9 +226,9 @@ cga_init(void)
     //open chain 4 mode
     set_seq_register(0x4,0x8,0x8);
 
-    for(int i=0;i<VGA_SIZE+1;i++){
-        vga_buf[i]=0xff;
-    }
+    //for(int i=0;i<VGA_SIZE+1;i++){
+    //    vga_buf[i]=0xff;
+    //}
 }
 
 
@@ -394,7 +394,7 @@ kbd_proc_data(void)
         uint8_t *low = (uint8_t*)(KERNBASE+0xa0000);
         uint8_t *high = (uint8_t*)(KERNBASE+0xc0000);
             flg^=1;
-    for(uint8_t *p=low+640*155;p<(low+640*199);p++){
+    for(uint8_t *p=low+640*155;p<(low+640*156);p++){
             if(flg) *p=0xff;
             else *p=0;
     }

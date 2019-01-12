@@ -48,6 +48,8 @@ delay(void)
 #define   COM_LSR_TSRE	0x40	//   Transmitter off
 
 
+int vga256_24bit[256] = { 0x000000, 0x0000a8, 0x00a800, 0x00a8a8, 0xa80000, 0xa800a8, 0xa85400, 0xa8a8a8, 0x545454, 0x5454fc, 0x54fc54, 0x54fcfc, 0xfc5454, 0xfc54fc, 0xfcfc54, 0xfcfcfc, 0x000000, 0x141414, 0x202020, 0x2c2c2c, 0x383838, 0x444444, 0x505050, 0x606060, 0x707070, 0x808080, 0x909090, 0xa0a0a0, 0xb4b4b4, 0xc8c8c8, 0xe0e0e0, 0xfcfcfc, 0x0000fc, 0x4000fc, 0x7c00fc, 0xbc00fc, 0xfc00fc, 0xfc00bc, 0xfc007c, 0xfc0040, 0xfc0000, 0xfc4000, 0xfc7c00, 0xfcbc00, 0xfcfc00, 0xbcfc00, 0x7cfc00, 0x40fc00, 0x00fc00, 0x00fc40, 0x00fc7c, 0x00fcbc, 0x00fcfc, 0x00bcfc, 0x007cfc, 0x0040fc, 0x7c7cfc, 0x9c7cfc, 0xbc7cfc, 0xdc7cfc, 0xfc7cfc, 0xfc7cdc, 0xfc7cbc, 0xfc7c9c, 0xfc7c7c, 0xfc9c7c, 0xfcbc7c, 0xfcdc7c, 0xfcfc7c, 0xdcfc7c, 0xbcfc7c, 0x9cfc7c, 0x7cfc7c, 0x7cfc9c, 0x7cfcbc, 0x7cfcdc, 0x7cfcfc, 0x7cdcfc, 0x7cbcfc, 0x7c9cfc, 0xb4b4fc, 0xc4b4fc, 0xd8b4fc, 0xe8b4fc, 0xfcb4fc, 0xfcb4e8, 0xfcb4d8, 0xfcb4c4, 0xfcb4b4, 0xfcc4b4, 0xfcd8b4, 0xfce8b4, 0xfcfcb4, 0xe8fcb4, 0xd8fcb4, 0xc4fcb4, 0xb4fcb4, 0xb4fcc4, 0xb4fcd8, 0xb4fce8, 0xb4fcfc, 0xb4e8fc, 0xb4d8fc, 0xb4c4fc, 0x000070, 0x1c0070, 0x380070, 0x540070, 0x700070, 0x700054, 0x700038, 0x70001c, 0x700000, 0x701c00, 0x703800, 0x705400, 0x707000, 0x547000, 0x387000, 0x1c7000, 0x007000, 0x00701c, 0x007038, 0x007054, 0x007070, 0x005470, 0x003870, 0x001c70, 0x383870, 0x443870, 0x543870, 0x603870, 0x703870, 0x703860, 0x703854, 0x703844, 0x703838, 0x704438, 0x705438, 0x706038, 0x707038, 0x607038, 0x547038, 0x447038, 0x387038, 0x387044, 0x387054, 0x387060, 0x387070, 0x386070, 0x385470, 0x384470, 0x505070, 0x585070, 0x605070, 0x685070, 0x705070, 0x705068, 0x705060, 0x705058, 0x705050, 0x705850, 0x706050, 0x706850, 0x707050, 0x687050, 0x607050, 0x587050, 0x507050, 0x507058, 0x507060, 0x507068, 0x507070, 0x506870, 0x506070, 0x505870, 0x000040, 0x100040, 0x200040, 0x300040, 0x400040, 0x400030, 0x400020, 0x400010, 0x400000, 0x401000, 0x402000, 0x403000, 0x404000, 0x304000, 0x204000, 0x104000, 0x004000, 0x004010, 0x004020, 0x004030, 0x004040, 0x003040, 0x002040, 0x001040, 0x202040, 0x282040, 0x302040, 0x382040, 0x402040, 0x402038, 0x402030, 0x402028, 0x402020, 0x402820, 0x403020, 0x403820, 0x404020, 0x384020, 0x304020, 0x284020, 0x204020, 0x204028, 0x204030, 0x204038, 0x204040, 0x203840, 0x203040, 0x202840, 0x2c2c40, 0x302c40, 0x342c40, 0x3c2c40, 0x402c40, 0x402c3c, 0x402c34, 0x402c30, 0x402c2c, 0x40302c, 0x40342c, 0x403c2c, 0x40402c, 0x3c402c, 0x34402c, 0x30402c, 0x2c402c, 0x2c4030, 0x2c4034, 0x2c403c, 0x2c4040, 0x2c3c40, 0x2c3440, 0x2c3040, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000 };
+
 /***** VGA ports *****/
 
 #define VGA_GRAPHIC_BUF 0xA000
@@ -58,6 +60,7 @@ delay(void)
 #define EXT_MISC_WRITE 0x3C2
 #define ATTR_ADDR_DATA_PORT 0x3C0
 #define ATTR_DATA_READ_PORT 0x3C1
+#define INPUT_STAT1 0x3DA
 
 // Sequencer, graphics, and CRT controller registers
 #define SEQ_ADDR_PORT 0x3C4
@@ -70,6 +73,23 @@ delay(void)
 #define VGA_WIDTH 640
 #define VGA_HEIGHT 400
 #define VGA_SIZE (VGA_WIDTH*VGA_HEIGHT)
+
+void vgaSetPalette(int index, int r, int g, int b) {
+  outb(0x3C8, index);
+  outb(0x3C9, r); 
+  outb(0x3C9, g); 
+  outb(0x3C9, b); 
+}
+
+void setdefaultVGApalette() {
+  for(int index=0;index<256;index++) {
+    int value = vga256_24bit[index];
+    vgaSetPalette(index,
+               (value>>18)&0x3f,
+               (value>>10)&0x3f,
+               (value>>2)&0x3f);
+  }  
+}
 
 uint8_t read_universal_register(int addr_port, int data_port, uint8_t idx){
     uint8_t tmp = inb(addr_port);
@@ -92,7 +112,6 @@ void set_universal_register(int addr_port, int data_port, uint8_t idx, uint8_t m
 void write_universal_register(int addr_port, int data_port, uint8_t idx, uint8_t data){
     uint8_t tmp = inb(addr_port);
     outb(GC_ADDR_PORT, idx);
-    uint8_t val = inb(data_port);
     outb(data_port, data);
     outb(addr_port, tmp);
 }
@@ -133,11 +152,207 @@ void write_crtc_register(uint8_t idx, uint8_t data){
     write_universal_register(CRTC_ADDR_PORT,CRTC_DATA_PORT,idx,data);
 }
 
+void write_attr_register(uint8_t idx, uint8_t data){
+    uint8_t tmp = inb(INPUT_STAT1);//step 1
+    uint8_t tmpaddr = inb(ATTR_ADDR_DATA_PORT);//step 2
+    outb(ATTR_ADDR_DATA_PORT, idx);//step 3
+    //uint8_t tmpdata = inb(ATTR_DATA_READ_PORT);//step 4
+    //step 5
+    outb(ATTR_ADDR_DATA_PORT,data);//step 6
+    outb(ATTR_ADDR_DATA_PORT,tmpaddr);//step 7
+}
+
 void set_mode0x13(void){
     // Miscellaneous Output Register
     // odd/even page, horizontal sync, clock 00(320/640 pixel wide), ram enable
     outb(EXT_MISC_WRITE, 0x63);
+
+    // Sequencer registers
+    write_seq_register(0x00,0x03); //reset register
+    write_seq_register(0x01,0x01); //clocking mode register: 8 dots/char
+    write_seq_register(0x02,0x0F); //map mask register, 4 planes enable write
+    write_seq_register(0x03,0x00); //character map select register, for text mode
+    write_seq_register(0x04,0x0E); //sequencer memory mode register, enable chain 4, disable odd/even host memory, enable extended memory
+
+    // CRT controller registers
+    write_crtc_register(0x11,0x0E); //vertical retrace end register: unlock access
+
+    write_crtc_register(0x00,0x5F); //horizontal total register
+    write_crtc_register(0x01,0x4F); //end horizontal display register
+    write_crtc_register(0x02,0x50); //start horizontal blanking register
+    write_crtc_register(0x03,0x82); //end horizontal blanking register
+    write_crtc_register(0x04,0x54); //start horizontal retrace register
+    write_crtc_register(0x05,0x80); //end horizontal retrace register
+    write_crtc_register(0x06,0xBF); //vertical total register
+    write_crtc_register(0x07,0x1F); //overflow register
+    write_crtc_register(0x08,0x00); //preset row scan register
+    write_crtc_register(0x09,0x41); //maximum scan line register
+    write_crtc_register(0x10,0x9C); //vertical retrace start register
+    //0x11 set above
+    write_crtc_register(0x12,0x8F); //vertical display end register
+    write_crtc_register(0x13,0x28); //offset register
+    write_crtc_register(0x14,0x40); //underline location register: double-word addressing
+    write_crtc_register(0x15,0x96); //start vertical blanking register
+    write_crtc_register(0x16,0xB9); //end vertical blanking register
+    write_crtc_register(0x17,0xA3); //CRTC mode control register: word mode
+    write_crtc_register(0x18,0xFF); //line compare register
+
+    //Graphic controller registers
+    write_gc_register(0x00,0x00); //set/reset register
+    write_gc_register(0x01,0x00); //enable set/reset register: disable
+    write_gc_register(0x02,0x00); //color compare register
+    write_gc_register(0x03,0x00); //data rotate register: do not operate
+    write_gc_register(0x04,0x00); //read map select register
+    write_gc_register(0x05,0x40); //graphic mode register: 256-color shift mode, not interleave, not odd/even, read mode 0, write mode 0
+    write_gc_register(0x06,0x05); //misc graphic register: memory mapping 0xA0000~0xAFFFF, disable text mode
+    write_gc_register(0x07,0x0F); //color don't care register
+    write_gc_register(0x08,0xFF); //bit mask register
+
+    // Attribute registers
+    write_attr_register(0x00,0x00); //palette register 0
+    write_attr_register(0x01,0x01); //palette register 1
+    write_attr_register(0x02,0x02); //palette register 2
+    write_attr_register(0x03,0x03); //palette register 3
+    write_attr_register(0x04,0x04); //palette register 4
+    write_attr_register(0x05,0x05); //palette register 5
+    write_attr_register(0x06,0x06); //palette register 6
+    write_attr_register(0x07,0x07); //palette register 7
+    write_attr_register(0x08,0x08); //palette register 8
+    write_attr_register(0x09,0x09); //palette register 9
+    write_attr_register(0x0A,0x0A); //palette register A
+    write_attr_register(0x0B,0x0B); //palette register B
+    write_attr_register(0x0C,0x0C); //palette register C
+    write_attr_register(0x0D,0x0D); //palette register D
+    write_attr_register(0x0E,0x0E); //palette register E
+    write_attr_register(0x0F,0x0F); //palette register F
+    write_attr_register(0x10,0x41); //attribute mode control register: 8-bit color, graphic mode
+    write_attr_register(0x11,0x00); //overscan color register
+    write_attr_register(0x12,0x0F); //color plane enable register: all enable
+    write_attr_register(0x13,0x00); //horizontal pixel panning register: shift 0
+    write_attr_register(0x14,0x00); //color select register
+
+
+    inb(INPUT_STAT1);
+    outb(ATTR_ADDR_DATA_PORT, 0x20);
+    setdefaultVGApalette();
+
+
 }
+
+
+
+#define VGA 0x3C0
+
+void write3C0(unsigned char index, unsigned char value) {
+
+// get VGA port into index mode
+  inb(VGA+0x1A);
+  outb(0x3C0, index);
+  outb(0x3C0, value);
+}
+
+void write3C2(unsigned char value) {
+  outb(0x3C2, value);
+}
+
+void write3C4(unsigned char index, unsigned char value) {
+  outb(0x3C4, index);
+  outb(0x3C5, value);
+}
+
+void write3CE(unsigned char index, unsigned char value) {
+  outb(0x3CE, index);
+  outb(0x3CF, value);
+}
+
+void write3D4(unsigned char index, unsigned char value) {
+  outb(0x3D4, index);
+  outb(0x3D5, value);
+}
+
+void write3C6(unsigned char value) {
+  outb(0x3C6,value);
+}
+
+
+
+void vgaMode13() {
+        
+      write3C2(0x63);
+
+      write3C4(0x00, 0x03);
+      write3C4(0x01, 0x01);
+      write3C4(0x02, 0x0F);
+      write3C4(0x03, 0x00);
+      write3C4(0x04, 0x0E);
+
+      // unlock VGA register access
+      // the top bit says to disable write access to some VGA index registers
+      // see http://www.osdever.net/FreeVGA/vga/crtcreg.htm#11
+      write3D4(0x11, 0x0E);
+
+      
+      write3D4(0x00, 0x5F);
+      write3D4(0x01, 0x4F);
+      write3D4(0x02, 0x50);
+      write3D4(0x03, 0x82);
+      write3D4(0x04, 0x54);
+      write3D4(0x05, 0x80);
+      write3D4(0x06, 0xBF);
+      write3D4(0x07, 0x1F);
+      write3D4(0x08, 0x00);
+      write3D4(0x09, 0x41);
+      write3D4(0x10, 0x9C);
+      // index 0x11, see above
+      write3D4(0x12, 0x8F);
+      write3D4(0x13, 0x28);
+      write3D4(0x14, 0x40);
+      write3D4(0x15, 0x96);
+      write3D4(0x16, 0xB9);
+      write3D4(0x17, 0xA3);
+      write3D4(0x18, 0xFF);
+      
+      write3CE(0x00, 0x00);
+      write3CE(0x01, 0x00);
+      write3CE(0x02, 0x00);
+      write3CE(0x03, 0x00);
+      write3CE(0x04, 0x00);
+      write3CE(0x05, 0x40);
+      write3CE(0x06, 0x05);
+      write3CE(0x07, 0x0F);
+      write3CE(0x08, 0xFF);
+
+      // switch to mode 0x13
+      write3C0(0x00, 0x00);
+      write3C0(0x01, 0x01);
+      write3C0(0x02, 0x02);
+      write3C0(0x03, 0x03);
+      write3C0(0x04, 0x04);
+      write3C0(0x05, 0x05);
+      write3C0(0x06, 0x06);
+      write3C0(0x07, 0x07);
+      write3C0(0x08, 0x08);
+      write3C0(0x09, 0x09);
+      write3C0(0x0A, 0x0A);
+      write3C0(0x0B, 0x0B);
+      write3C0(0x0C, 0x0C);
+      write3C0(0x0D, 0x0D);
+      write3C0(0x0E, 0x0E);
+      write3C0(0x0F, 0x0F);                                   
+      write3C0(0x10, 0x41);
+      write3C0(0x11, 0x00);
+      write3C0(0x12, 0x0F);
+      write3C0(0x13, 0x00);
+      write3C0(0x14, 0x00);
+
+
+      // enable display??
+      inb(VGA+0x1A);
+      outb(0x3C0, 0x20);
+
+      setdefaultVGApalette();
+}
+
 
 static bool serial_exists;
 
@@ -260,16 +475,18 @@ cga_init(void)
     crt_buf = NULL;
 
     //////////////////////////////////////////////////////////////
-    set_gc_register(0x6,0x1,0x1);
-    outb(EXT_MISC_WRITE,0x0);
+    //set_mode0x13();
+    vgaMode13();
+    //set_gc_register(0x6,0x1,0x1);
+    //outb(EXT_MISC_WRITE,0x0);
 
     //set_seq_register(0x2,0xf,0xf);
     //open chain 4 mode
-    set_seq_register(0x4,0x8,0x8);
+    //set_seq_register(0x4,0x8,0x8);
 
-    //for(int i=0;i<VGA_SIZE+1;i++){
-    //    vga_buf[i]=0xff;
-    //}
+    for(int i=0;i<VGA_SIZE;i++){
+        vga_buf[i]=0x0f;
+    }
 }
 
 
@@ -433,14 +650,15 @@ static int
 kbd_proc_data(void)
 {
         //uint8_t *low = (uint8_t*)(KERNBASE+0xa0000);
-        uint8_t *low = (uint8_t*)(KERNBASE+0xb8000);
-        //uint8_t *high = (uint8_t*)(KERNBASE+0xc0000);
-        uint8_t *high = low+2;
-            flg^=1;
+        uint8_t *low = (uint8_t*)(KERNBASE+0xa0000);
+        uint8_t *high = (uint8_t*)(KERNBASE+0xb0000);
+        //uint8_t *high = low+2;
     for(uint8_t *p=low;p<high;p++){
-            if(flg) *p=0xff;
-            else *p=0;
+            *p = 0xff;
+            //if(flg) *p=0xff;
+            //else *p=0;
     }
+            //flg^=1;
     cprintf("%x\n",flg);
     cprintf("%x\n",*high);
     //cprintf("%x\n",vga_buf+VGA_SIZE);

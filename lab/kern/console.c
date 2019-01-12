@@ -52,14 +52,21 @@ delay(void)
 
 #define VGA_GRAPHIC_BUF 0xA000
 
-#define GC_ADDR_PORT 0x3CE
-#define GC_DATA_PORT 0x3CF
-#define SEQ_ADDR_PORT 0x3C4
-#define SEQ_DATA_PORT 0x3C5
-#define ATTR_ADDR_DATA_PORT 0x3C0
-#define ATTR_DATA_READ_PORT 0x3C1
+// External registers
+#define EXT_INPUT0_READ 0x3C2
 #define EXT_MISC_READ 0x3CC
 #define EXT_MISC_WRITE 0x3C2
+#define ATTR_ADDR_DATA_PORT 0x3C0
+#define ATTR_DATA_READ_PORT 0x3C1
+
+// Sequencer, graphics, and CRT controller registers
+#define SEQ_ADDR_PORT 0x3C4
+#define SEQ_DATA_PORT 0x3C5
+#define GC_ADDR_PORT 0x3CE
+#define GC_DATA_PORT 0x3CF
+#define CRTC_ADDR_PORT 0x3D4
+#define CRTC_DATA_PORT 0x3D5
+
 #define VGA_WIDTH 640
 #define VGA_HEIGHT 400
 #define VGA_SIZE (VGA_WIDTH*VGA_HEIGHT)
@@ -82,6 +89,14 @@ void set_universal_register(int addr_port, int data_port, uint8_t idx, uint8_t m
     outb(addr_port, tmp);
 }
 
+void write_universal_register(int addr_port, int data_port, uint8_t idx, uint8_t data){
+    uint8_t tmp = inb(addr_port);
+    outb(GC_ADDR_PORT, idx);
+    uint8_t val = inb(data_port);
+    outb(data_port, data);
+    outb(addr_port, tmp);
+}
+
 uint8_t read_gc_register(uint8_t idx){
     return read_universal_register(GC_ADDR_PORT,GC_DATA_PORT,idx);
 }
@@ -90,12 +105,38 @@ uint8_t read_seq_register(uint8_t idx){
     return read_universal_register(SEQ_ADDR_PORT,SEQ_DATA_PORT,idx);
 }
 
+uint8_t read_crtc_register(uint8_t idx){
+    return read_universal_register(CRTC_ADDR_PORT,CRTC_DATA_PORT,idx);
+}
+
 void set_gc_register(uint8_t idx, uint8_t mask, uint8_t data){
     set_universal_register(GC_ADDR_PORT,GC_DATA_PORT,idx,mask,data);
 }
 
 void set_seq_register(uint8_t idx, uint8_t mask, uint8_t data){
     set_universal_register(SEQ_ADDR_PORT,SEQ_DATA_PORT,idx,mask,data);
+}
+
+void set_crtc_register(uint8_t idx, uint8_t mask, uint8_t data){
+    set_universal_register(CRTC_ADDR_PORT,CRTC_DATA_PORT,idx,mask,data);
+}
+
+void write_gc_register(uint8_t idx, uint8_t data){
+    write_universal_register(GC_ADDR_PORT,GC_DATA_PORT,idx,data);
+}
+
+void write_seq_register(uint8_t idx, uint8_t data){
+    write_universal_register(SEQ_ADDR_PORT,SEQ_DATA_PORT,idx,data);
+}
+
+void write_crtc_register(uint8_t idx, uint8_t data){
+    write_universal_register(CRTC_ADDR_PORT,CRTC_DATA_PORT,idx,data);
+}
+
+void set_mode0x13(void){
+    // Miscellaneous Output Register
+    // odd/even page, horizontal sync, clock 00(320/640 pixel wide), ram enable
+    outb(EXT_MISC_WRITE, 0x63);
 }
 
 static bool serial_exists;
@@ -391,10 +432,12 @@ int flg=0;
 static int
 kbd_proc_data(void)
 {
-        uint8_t *low = (uint8_t*)(KERNBASE+0xa0000);
-        uint8_t *high = (uint8_t*)(KERNBASE+0xc0000);
+        //uint8_t *low = (uint8_t*)(KERNBASE+0xa0000);
+        uint8_t *low = (uint8_t*)(KERNBASE+0xb8000);
+        //uint8_t *high = (uint8_t*)(KERNBASE+0xc0000);
+        uint8_t *high = low+2;
             flg^=1;
-    for(uint8_t *p=low+640*155;p<(low+640*156);p++){
+    for(uint8_t *p=low;p<high;p++){
             if(flg) *p=0xff;
             else *p=0;
     }

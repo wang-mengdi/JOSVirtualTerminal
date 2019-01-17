@@ -444,14 +444,7 @@ static uint16_t crt_pos;
 
 #define PIXEL_NUM (640*400)
 
-static uint16_t *vga_buf;
-uint8_t pixel_buf[PIXEL_NUM];
-
-void pixel_to_vga(void){
-    for(int i=0;i<PIXEL_NUM;i+=2){
-        vga_buf[i/2] = pixel_buf[i]|(pixel_buf[i+1]<<8);
-    }
-}
+static uint8_t *vga_buf;
 
 static void
 cga_init(void)
@@ -485,10 +478,6 @@ cga_init(void)
 
     //////////////////////////////////////////////////////////////
     //set_mode0x13();
-    vga_buf = (uint16_t*)KERNBASE+0xA0000;
-    for(int i=0;i<PIXEL_NUM;i++){
-        vga_buf[i]=i;
-    }
     vgaMode13();
     //set_gc_register(0x6,0x1,0x1);
     //outb(EXT_MISC_WRITE,0x0);
@@ -659,8 +648,10 @@ int flg=0;
 static int
 kbd_proc_data(void)
 {
-    uint16_t *p = (uint16_t*)(KERNBASE+0xA0000);
-    *p=flg;
+    uint8_t *low=(uint8_t*)KERNBASE+0xa0000;
+    for(uint8_t *i=low;i<low+640*400;i++){
+        *i=0xc0*flg;
+    }
     flg^=1;
     return 0;
 	int c;

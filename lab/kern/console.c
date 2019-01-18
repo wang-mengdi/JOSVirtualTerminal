@@ -316,25 +316,25 @@ static uint16_t crt_pos;
 static uint8_t *vga_buf;
 static uint8_t second_buf[VGA_SIZE];
 
-int frog_x = 0;
-int frog_y = VGA_WIDTH-1-17*2;
-int frog_dir = 1;
+#define SUB_X0 10
+#define SUB_Y0 10
+#define SUB_WIDTH 160
+#define SUB_HEIGHT 100
+#define SUB_BORDER 4
+
+int frogwindow_on;
+
+int frog_x;// = 0;
+int frog_y;// = VGA_WIDTH-1-17*2;
+//int frog_dir = 1;
+int frog_vx = 1;
+int frog_vy = 1;
 
 
 void swap_buf(void){
     memmove(vga_buf,second_buf,VGA_SIZE*sizeof(uint8_t));
 }
 
-void paint_frog(int x0,int y0){
-    int k=0;
-    for(int i=0;i<16*2;i++){
-        for(int j=0;j<17*2;j++){
-            paint_point(x0+i,y0+j,frog[k++]);
-            //paint_point(i,VGA_WIDTH-17*2-1+j,frog[k++]);
-            //paint_point(i,j,0x2);
-        }
-    }
-}
 
 static void
 cga_init(void)
@@ -362,6 +362,11 @@ cga_init(void)
 	pos |= inb(addr_6845 + 1);*/
 
 	crt_pos = 0;
+    frogwindow_on = 0;
+    frog_x = SUB_X0+SUB_BORDER/2;
+    frog_y = SUB_Y0+SUB_BORDER/2;
+    frog_vx = 1;
+    frog_vy = 1;
 
     //crt_buf = NULL;
 
@@ -383,8 +388,6 @@ cga_init(void)
 
 
 void paint_crt_buf(void){
-    paint_rect(0,0,VGA_WIDTH,VGA_HEIGHT,0x0f);
-    //paint_rect(1,1,VGA_WIDTH-5,VGA_HEIGHT-5,0x1D);
     uint8_t flg=0;
     for(int i=0;i<CHAR_MAX_ROW;i++){
         for(int j=0;j<CHAR_MAX_COL;j++){
@@ -397,7 +400,47 @@ void paint_crt_buf(void){
         }
     }
 END:;
-    paint_frog(0,VGA_WIDTH-1-17*2);
+}
+
+#define FROG_W 34
+#define FROG_H 32
+
+void paint_frog(int x0,int y0){
+    int k=0;
+    for(int i=0;i<FROG_H;i++){
+        for(int j=0;j<FROG_W;j++){
+            paint_point(x0+i,y0+j,frog[k++]);
+            //paint_point(i,VGA_WIDTH-17*2-1+j,frog[k++]);
+            //paint_point(i,j,0x2);
+        }
+    }
+}
+
+void paint_frogwindow(void){
+    paint_rect(SUB_X0,SUB_Y0,SUB_WIDTH,SUB_HEIGHT,0x35);
+    paint_rect(SUB_X0+SUB_BORDER/2,SUB_Y0+SUB_BORDER/2,SUB_WIDTH-SUB_BORDER,SUB_HEIGHT-SUB_BORDER,0x1D);
+    paint_frog(frog_x,frog_y);
+    frog_x+=frog_vx;
+    if(SUB_X0+SUB_BORDER/2<=frog_x&&frog_x+FROG_H<SUB_X0+SUB_HEIGHT-SUB_BORDER/2){}
+    else{
+        frog_x-=frog_vx;
+        frog_vx*=-1;
+    }
+    frog_y+=frog_vy;
+    if(SUB_Y0+SUB_BORDER/2<=frog_y&&frog_y+FROG_W<SUB_Y0+SUB_WIDTH-SUB_BORDER/2){}
+    else{
+        frog_y-=frog_vy;
+        frog_vy*=-1;
+    }
+}
+
+void repaint_all(void){
+    paint_rect(0,0,VGA_WIDTH,VGA_HEIGHT,0x0f);
+    paint_crt_buf();
+    //paint_frog(0,VGA_WIDTH-1-17*2);
+    if(frogwindow_on){
+        paint_frogwindow();
+    }
     swap_buf();
 }
 
@@ -441,7 +484,8 @@ cga_putc(int ci)
 		crt_pos -= CHAR_MAX_COL;
 	}
 
-    paint_crt_buf();
+    repaint_all();
+
 
 	/* move that little blinky thing */
 	/*outb(addr_6845, 14);
@@ -577,15 +621,34 @@ kbd_proc_data(void)
 	int c;
 	uint8_t stat, data;
 	static uint32_t shift;
+    static uint8_t ctrl;
 
 	stat = inb(KBSTATP);
-	if ((stat & KBS_DIB) == 0)
+	if ((stat & KBS_DIB) == 0){
+        repaint_all();
 		return -1;
+    }
 	// Ignore data from mouse.
-	if (stat & KBS_TERR)
+	if (stat & KBS_TERR){
+        repaint_all();
 		return -1;
+    }
 
 	data = inb(KBDATAP);
+    //cprintf("%x\n",data);
+    if(data==0x1D){
+        ctrl=1;
+    }
+    if(data==0x9D){
+        ctrl=0;
+    }
+    if(ctrl==1&&data==0x21){//ctrl+f, don't ask me why
+        frogwindow_on=1;
+    }
+    if(ctrl==1&&data==0x2e){//ctrl+c, don't ask me why
+        frogwindow_on=0;
+    }
+    repaint_all();
 
 	if (data == 0xE0) {
 		// E0 escape character

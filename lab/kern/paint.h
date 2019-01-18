@@ -5,12 +5,12 @@
 # error "This is a JOS kernel header; user programs should not #include it"
 #endif
 
-typedef COLOR uint8_t;
+typedef uint8_t COLOR;
 
-uint8_t xy_to_base(int x, int y); 
+uint8_t* xy_to_base(int x, int y); 
 
-void paint_point(int x, int y, COLOR c = 0xff);
-void paint_char(int x, int y, int ch, COLOR c = 0xff);
-void paint_rect(int x, int y, int w, int h, COLOR c = 0xff);
+void paint_point(int x, int y, COLOR c);
+void paint_char(int x, int y, int ch, COLOR c);
+void paint_rect(int x, int y, int w, int h, COLOR c);
 
 #endif

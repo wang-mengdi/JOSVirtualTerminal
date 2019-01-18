@@ -17,6 +17,30 @@
 #define CRT_COLS	80
 #define CRT_SIZE	(CRT_ROWS * CRT_COLS)
 
+/***** VGA ports *****/
+
+#define VGA_GRAPHIC_BUF 0xA0000
+
+// External registers
+#define EXT_INPUT0_READ 0x3C2
+#define EXT_MISC_READ 0x3CC
+#define EXT_MISC_WRITE 0x3C2
+#define ATTR_ADDR_DATA_PORT 0x3C0
+#define ATTR_DATA_READ_PORT 0x3C1
+#define INPUT_STAT1 0x3DA
+
+// Sequencer, graphics, and CRT controller registers
+#define SEQ_ADDR_PORT 0x3C4
+#define SEQ_DATA_PORT 0x3C5
+#define GC_ADDR_PORT 0x3CE
+#define GC_DATA_PORT 0x3CF
+#define CRTC_ADDR_PORT 0x3D4
+#define CRTC_DATA_PORT 0x3D5
+
+#define VGA_WIDTH 640
+#define VGA_HEIGHT 400
+#define VGA_SIZE (VGA_WIDTH*VGA_HEIGHT)
+
 void cons_init(void);
 int cons_getc(void);
 

@@ -305,13 +305,10 @@ lpt_putc(int c)
 /***** Text-mode CGA/VGA display output *****/
 
 static unsigned addr_6845;
-static uint16_t *crt_buf;
+static uint8_t crt_buf[CHAR_MAX_NUM*2];
 static uint16_t crt_pos;
 
-#define PIXEL_NUM (640*400)
-
 static uint8_t *vga_buf;
-static uint8_t char_buf[80*25];
 
 static void
 cga_init(void)
@@ -333,15 +330,14 @@ cga_init(void)
 	}
 
 	/* Extract cursor location */
-	outb(addr_6845, 14);
+	/*outb(addr_6845, 14);
 	pos = inb(addr_6845 + 1) << 8;
 	outb(addr_6845, 15);
-	pos |= inb(addr_6845 + 1);
+	pos |= inb(addr_6845 + 1);*/
 
-	crt_buf = (uint16_t*) cp;
-	crt_pos = pos;
+	crt_pos = 0;
 
-    crt_buf = NULL;
+    //crt_buf = NULL;
 
     //////////////////////////////////////////////////////////////
     vga_buf = (uint8_t*)KERNBASE+0xA0000;
@@ -359,27 +355,34 @@ cga_init(void)
 }
 
 
+void paint_crt_buf(void){
+        paint_rect(0,0,VGA_WIDTH,VGA_HEIGHT,0x0f);
+    for(int i=0;i<CHAR_MAX_ROW;i++){
+        for(int j=0;j<CHAR_MAX_COL;j++){
+            int cid=i*CHAR_MAX_COL+j;
+            int x=i*CHAR_HEIGHT,y=j*CHAR_WIDTH;
+            paint_char(x,y,crt_buf[cid],0xff);
+        }
+    }
+}
 
 static void
-cga_putc(int c)
+cga_putc(int ci)
 {
-        return;
+        uint8_t c=(uint8_t)ci;
 	// if no attribute given, then use black on white
-	if (!(c & ~0xFF))
-		c |= 0x0700;
-
-	switch (c & 0xff) {
+	switch (c) {
 	case '\b':
 		if (crt_pos > 0) {
 			crt_pos--;
-			crt_buf[crt_pos] = (c & ~0xff) | ' ';
+			crt_buf[crt_pos] = ' ';
 		}
 		break;
 	case '\n':
-		crt_pos += CRT_COLS;
+		crt_pos += CHAR_MAX_COL;
 		/* fallthru */
 	case '\r':
-		crt_pos -= (crt_pos % CRT_COLS);
+		crt_pos -= (crt_pos % CHAR_MAX_COL);
 		break;
 	case '\t':
 		cons_putc(' ');
@@ -394,20 +397,22 @@ cga_putc(int c)
 	}
 
 	// What is the purpose of this?
-	if (crt_pos >= CRT_SIZE) {
+	if (crt_pos >= CHAR_MAX_NUM) {
 		int i;
 
-		memmove(crt_buf, crt_buf + CRT_COLS, (CRT_SIZE - CRT_COLS) * sizeof(uint16_t));
-		for (i = CRT_SIZE - CRT_COLS; i < CRT_SIZE; i++)
-			crt_buf[i] = 0x0700 | ' ';
-		crt_pos -= CRT_COLS;
+		memmove(crt_buf, crt_buf + CHAR_MAX_COL, (CHAR_MAX_NUM - CHAR_MAX_COL) * sizeof(uint8_t));
+		for (i = CHAR_MAX_NUM - CHAR_MAX_COL; i < CHAR_MAX_NUM; i++)
+			crt_buf[i] = ' ';
+		crt_pos -= CHAR_MAX_COL;
 	}
 
+    paint_crt_buf();
+
 	/* move that little blinky thing */
-	outb(addr_6845, 14);
+	/*outb(addr_6845, 14);
 	outb(addr_6845 + 1, crt_pos >> 8);
 	outb(addr_6845, 15);
-	outb(addr_6845 + 1, crt_pos);
+	outb(addr_6845 + 1, crt_pos);*/
 }
 
 
@@ -518,11 +523,12 @@ int flg=0;
 static int
 kbd_proc_data(void)
 {
-    for (int i = 0; i < VGA_HEIGHT; ++i) {
+        //paint_char(0,0,'A',0xff);
+    /*for (int i = 0; i < VGA_HEIGHT; ++i) {
 	for (int j = 0; j < VGA_WIDTH; ++j) {
 		paint_point(i, j, 0xc0);
 	}
-    }
+    }*/
 /*
     uint8_t *low=(uint8_t*)KERNBASE+0xa0000;
     for(uint8_t *i=low;i<low+320*200;i++){
@@ -532,7 +538,7 @@ kbd_proc_data(void)
         }
 <<<<<<< HEAD
     }*/
-    return 0;
+    //return 0;
 	int c;
 	uint8_t stat, data;
 	static uint32_t shift;

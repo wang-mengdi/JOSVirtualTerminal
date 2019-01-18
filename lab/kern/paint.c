@@ -1,13 +1,9 @@
 #include <inc/memlayout.h>
 
 #include <kern/console.h>
-#include <kern/paint.h>
 
 #define VGABIAS 0xa0000
 #define VGABASE ((uint8_t *) KERNBASE + VGABIAS)
-
-#define CHAR_WIDTH 5
-#define CHAR_HEIGHT 8
 
 /*const bool char_lattice[1][40] = { 
 { // 0: exclamation
@@ -296,7 +292,7 @@ void paint_char(int x, int y, char ch, COLOR c) {
 		for (int j = 0; j < CHAR_WIDTH; ++j) {
 //			if (char_lattice[ch][i * CHAR_WIDTH + j])
 //				paint_point(x + i, y + j, c);
-			if ((g_8x16_font[ch * 16 + i] >> j) & 1)
+			if ((g_8x16_font[ch * 16 + i] >> (7-j)) & 1)
 				paint_point(x + i, y + j, c);
 		}
 }

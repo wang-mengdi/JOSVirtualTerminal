@@ -63,5 +63,4 @@ fs_test(void)
 	file_flush(f);
 	assert(!(uvpt[PGNUM(blk)] & PTE_D));
 	assert(!(uvpt[PGNUM(f)] & PTE_D));
-	cprintf("file rewrite is good\n");
 }

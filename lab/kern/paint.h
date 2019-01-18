@@ -5,6 +5,9 @@
 # error "This is a JOS kernel header; user programs should not #include it"
 #endif
 
+#define CHAR_WIDTH 8
+#define CHAR_HEIGHT 16
+
 typedef uint8_t COLOR;
 
 uint8_t* xy_to_base(int x, int y); 

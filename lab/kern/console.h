@@ -7,6 +7,7 @@
 #endif
 
 #include <inc/types.h>
+#include <kern/paint.h>
 
 #define MONO_BASE	0x3B4
 #define MONO_BUF	0xB0000
@@ -40,6 +41,10 @@
 #define VGA_WIDTH 320
 #define VGA_HEIGHT 200
 #define VGA_SIZE (VGA_WIDTH*VGA_HEIGHT)
+
+#define CHAR_MAX_COL (VGA_WIDTH/CHAR_WIDTH)
+#define CHAR_MAX_ROW (VGA_HEIGHT/CHAR_HEIGHT)
+#define CHAR_MAX_NUM (CHAR_MAX_COL*CHAR_MAX_ROW)
 
 void cons_init(void);
 int cons_getc(void);

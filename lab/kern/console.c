@@ -101,7 +101,7 @@ uint8_t read_universal_register(int addr_port, int data_port, uint8_t idx){
 
 void set_universal_register(int addr_port, int data_port, uint8_t idx, uint8_t mask, uint8_t data){
     uint8_t tmp = inb(addr_port);
-    outb(GC_ADDR_PORT, idx);
+    outb(addr_port, idx);
     uint8_t val = inb(data_port);
     val &= ~mask;
     val |= (data&mask);
@@ -111,7 +111,7 @@ void set_universal_register(int addr_port, int data_port, uint8_t idx, uint8_t m
 
 void write_universal_register(int addr_port, int data_port, uint8_t idx, uint8_t data){
     uint8_t tmp = inb(addr_port);
-    outb(GC_ADDR_PORT, idx);
+    outb(addr_port, idx);
     outb(data_port, data);
     outb(addr_port, tmp);
 }
@@ -477,8 +477,8 @@ cga_init(void)
     crt_buf = NULL;
 
     //////////////////////////////////////////////////////////////
-    //set_mode0x13();
-    vgaMode13();
+    set_mode0x13();
+    //vgaMode13();
     //set_gc_register(0x6,0x1,0x1);
     //outb(EXT_MISC_WRITE,0x0);
 
@@ -649,8 +649,11 @@ static int
 kbd_proc_data(void)
 {
     uint8_t *low=(uint8_t*)KERNBASE+0xa0000;
-    for(uint8_t *i=low;i<low+640*400;i++){
-        *i=0xc0*flg;
+    for(uint8_t *i=low;i<low+320*200;i++){
+        if(i<low+320*100) *i=0xc0*flg;
+        else{
+            *i=0xf0;
+        }
     }
     flg^=1;
     return 0;

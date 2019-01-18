@@ -323,6 +323,7 @@ static uint8_t second_buf[VGA_SIZE];
 #define SUB_BORDER 4
 
 int frogwindow_on;
+int window_simple;
 
 int frog_x;// = 0;
 int frog_y;// = VGA_WIDTH-1-17*2;
@@ -363,6 +364,7 @@ cga_init(void)
 
 	crt_pos = 0;
     frogwindow_on = 0;
+    window_simple = 0;
     frog_x = SUB_X0+SUB_BORDER/2;
     frog_y = SUB_Y0+SUB_BORDER/2;
     frog_vx = 1;
@@ -417,8 +419,15 @@ void paint_frog(int x0,int y0){
 }
 
 void paint_frogwindow(void){
-    paint_rect(SUB_X0,SUB_Y0,SUB_WIDTH,SUB_HEIGHT,0x35);
-    paint_rect(SUB_X0+SUB_BORDER/2,SUB_Y0+SUB_BORDER/2,SUB_WIDTH-SUB_BORDER,SUB_HEIGHT-SUB_BORDER,0x1D);
+    struct COLOR_RGB c1={128,0,0};
+    struct COLOR_RGB c2={255,0,0};
+    if(window_simple==1){
+        paint_rect(SUB_X0,SUB_Y0,SUB_WIDTH,SUB_HEIGHT,0x35);
+        paint_rect(SUB_X0+SUB_BORDER/2,SUB_Y0+SUB_BORDER/2,SUB_WIDTH-SUB_BORDER,SUB_HEIGHT-SUB_BORDER,0x1D);
+    }
+    else{
+        paint_rect_dclr_hori(SUB_X0,SUB_Y0,SUB_WIDTH,SUB_HEIGHT,c1,c2);
+    }
     paint_frog(frog_x,frog_y);
     frog_x+=frog_vx;
     if(SUB_X0+SUB_BORDER/2<=frog_x&&frog_x+FROG_H<SUB_X0+SUB_HEIGHT-SUB_BORDER/2){}
@@ -635,7 +644,6 @@ kbd_proc_data(void)
     }
 
 	data = inb(KBDATAP);
-    //cprintf("%x\n",data);
     if(data==0x1D){
         ctrl=1;
     }
@@ -647,6 +655,9 @@ kbd_proc_data(void)
     }
     if(ctrl==1&&data==0x2e){//ctrl+c, don't ask me why
         frogwindow_on=0;
+    }
+    if(ctrl==1&&data==0x1f){//ctrl+s, don't ask me why
+        window_simple^=1;
     }
     repaint_all();
 

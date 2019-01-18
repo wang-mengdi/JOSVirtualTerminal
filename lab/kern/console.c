@@ -514,6 +514,12 @@ int flg=0;
 static int
 kbd_proc_data(void)
 {
+    for (int i = 0; i < VGA_HEIGHT; ++i) {
+	for (int j = 0; j < VGA_WIDTH; ++j) {
+		paint_point(i, j, 0xc0);
+	}
+    }
+/*
     uint8_t *low=(uint8_t*)KERNBASE+0xa0000;
     for(uint8_t *i=low;i<low+320*200;i++){
         if(i<low+320*100) *i=0xc0*flg;
@@ -521,7 +527,7 @@ kbd_proc_data(void)
             *i=0xf0;
         }
     }
-    flg^=1;
+    flg^=1;*/
     return 0;
 	int c;
 	uint8_t stat, data;

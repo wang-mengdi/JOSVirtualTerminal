@@ -74,21 +74,21 @@ static int vga256_24bit[256] = { 0x000000, 0x0000a8, 0x00a800, 0x00a8a8, 0xa8000
 #define VGA_HEIGHT 400
 #define VGA_SIZE (VGA_WIDTH*VGA_HEIGHT)
 
-void vgaSetPalette(int index, int r, int g, int b) {
+void set_palette_index(int index, int r, int g, int b) {
   outb(0x3C8, index);
   outb(0x3C9, r); 
   outb(0x3C9, g); 
   outb(0x3C9, b); 
 }
 
-void setdefaultVGApalette() {
-  for(int index=0;index<256;index++) {
-    int value = vga256_24bit[index];
-    vgaSetPalette(index,
-               (value>>18)&0x3f,
-               (value>>10)&0x3f,
-               (value>>2)&0x3f);
-  }  
+void set_palette_with(int *palette){
+    for(int index=0;index<256;index++){
+        int value = palette[index];
+        set_palette_index(index,
+            (value>>18)&0x3f,
+            (value>>10)&0x3f,
+            (value>>2)&0x3f);
+    }  
 }
 
 uint8_t read_universal_register(int addr_port, int data_port, uint8_t idx){
@@ -234,7 +234,7 @@ void set_mode0x13(void){
 
     inb(INPUT_STAT1);
     outb(ATTR_ADDR_DATA_PORT, 0x20);
-    setdefaultVGApalette();
+    set_palette_with(vga256_24bit);
 
 
 }
@@ -349,8 +349,8 @@ void vgaMode13() {
       // enable display??
       inb(VGA+0x1A);
       outb(0x3C0, 0x20);
-
-      setdefaultVGApalette();
+      
+      set_palette_with(vga256_24bit);
 }
 
 

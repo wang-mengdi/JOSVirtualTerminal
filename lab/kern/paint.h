@@ -9,6 +9,11 @@
 #define CHAR_HEIGHT 16
 
 typedef uint8_t COLOR;
+struct COLOR_RGB {
+        int r;
+        int g;
+        int b;
+};
 
 void set_vga_base(uint8_t *b);
 
@@ -17,5 +22,11 @@ uint8_t* xy_to_base(int x, int y);
 void paint_point(int x, int y, COLOR c);
 void paint_char(int x, int y, char ch, COLOR c);
 void paint_rect(int x, int y, int w, int h, COLOR c);
+
+void paint_rect_dclr_hori(int x, int y, int w, int h, 
+        struct COLOR_RGB c0, struct COLOR_RGB c1);
+
+COLOR color_shift(struct COLOR_RGB c0, struct COLOR_RGB c1, int lim, int x);
+
 
 #endif

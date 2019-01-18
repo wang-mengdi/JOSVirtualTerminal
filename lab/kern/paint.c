@@ -4,7 +4,7 @@
 #include <kern/paint.h>
 
 #define VGABIAS 0xa0000
-#define VGABASE ((uint8_t*) KERNBASE + VGABIAS)
+#define VGABASE ((uint8_t *) KERNBASE + VGABIAS)
 
 #define CHAR_WIDTH 5
 #define CHAR_HEIGHT 8

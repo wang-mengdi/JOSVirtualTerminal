@@ -37,8 +37,8 @@
 #define CRTC_ADDR_PORT 0x3D4
 #define CRTC_DATA_PORT 0x3D5
 
-#define VGA_WIDTH 640
-#define VGA_HEIGHT 400
+#define VGA_WIDTH 320
+#define VGA_HEIGHT 200
 #define VGA_SIZE (VGA_WIDTH*VGA_HEIGHT)
 
 void cons_init(void);

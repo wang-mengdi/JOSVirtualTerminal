@@ -346,8 +346,8 @@ cga_init(void)
     //////////////////////////////////////////////////////////////
     vga_buf = (uint8_t*)KERNBASE+0xA0000;
     set_mode0x13();
-    for(int i=0;i<320*200;i++) vga_buf[i]=0xff;
-    paint_char(0,0,0,0xc0);
+    for(int i=0;i<320*200;i++) vga_buf[i]=0x0f;
+    paint_char(0,0,0,0xff);
     //vgaMode13();
     //set_gc_register(0x6,0x1,0x1);
     //outb(EXT_MISC_WRITE,0x0);

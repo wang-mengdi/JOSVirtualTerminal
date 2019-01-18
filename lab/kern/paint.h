@@ -10,6 +10,8 @@
 
 typedef uint8_t COLOR;
 
+void set_vga_base(uint8_t *b);
+
 uint8_t* xy_to_base(int x, int y); 
 
 void paint_point(int x, int y, COLOR c);

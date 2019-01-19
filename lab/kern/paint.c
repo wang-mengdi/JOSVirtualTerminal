@@ -486,9 +486,9 @@ COLOR color_shift(struct COLOR_RGB c0, struct COLOR_RGB c1, int lim, int x) {
 }
 
 COLOR rgb_to_vga(struct COLOR_RGB c) {
-	int r = c / 32;
-	int g = c / 32;
-	int b = c / 32;
+	int r = c.r / 32;
+	int g = c.g / 32;
+	int b = c.b / 32;
 	return color_rgb[r][g][b];
 }
 

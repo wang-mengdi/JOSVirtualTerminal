@@ -26,6 +26,9 @@ void paint_rect(int x, int y, int w, int h, COLOR c);
 void paint_rect_dclr_hori(int x, int y, int w, int h, 
         struct COLOR_RGB c0, struct COLOR_RGB c1);
 
+void paint_rect_dclr_vert(int x, int y, int w, int h, 
+        struct COLOR_RGB c0, struct COLOR_RGB c1);
+
 COLOR color_shift(struct COLOR_RGB c0, struct COLOR_RGB c1, int lim, int x);
 
 

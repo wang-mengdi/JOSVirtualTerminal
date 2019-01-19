@@ -419,14 +419,14 @@ void paint_frog(int x0,int y0){
 }
 
 void paint_frogwindow(void){
-    struct COLOR_RGB c1={128,0,0};
-    struct COLOR_RGB c2={255,0,0};
+    struct COLOR_RGB c1={255,255,255};
+    struct COLOR_RGB c2={0,0,255};
     if(window_simple==1){
         paint_rect(SUB_X0,SUB_Y0,SUB_WIDTH,SUB_HEIGHT,0x35);
         paint_rect(SUB_X0+SUB_BORDER/2,SUB_Y0+SUB_BORDER/2,SUB_WIDTH-SUB_BORDER,SUB_HEIGHT-SUB_BORDER,0x1D);
     }
     else{
-        paint_rect_dclr_hori(SUB_X0,SUB_Y0,SUB_WIDTH,SUB_HEIGHT,c1,c2);
+        paint_rect_dclr_vert(SUB_X0,SUB_Y0,SUB_WIDTH,SUB_HEIGHT,c1,c2);
     }
     paint_frog(frog_x,frog_y);
     frog_x+=frog_vx;

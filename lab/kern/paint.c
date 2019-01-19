@@ -479,6 +479,16 @@ COLOR color_shift(struct COLOR_RGB c0, struct COLOR_RGB c1, int lim, int x) {
 	int r = (int) ((float) (c1.r - c0.r) * ((float) x / (float) lim) + 0.5) + c0.r;
 	int g = (int) ((float) (c1.g - c0.g) * ((float) x / (float) lim) + 0.5) + c0.g;
 	int b = (int) ((float) (c1.b - c0.b) * ((float) x / (float) lim) + 0.5) + c0.b;
+	r /= 32;
+	g /= 32;
+	b /= 32;
+	return color_rgb[r][g][b];
+}
+
+COLOR rgb_to_vga(struct COLOR_RGB c) {
+	int r = c / 32;
+	int g = c / 32;
+	int b = c / 32;
 	return color_rgb[r][g][b];
 }
 
@@ -487,6 +497,17 @@ void paint_rect_dclr_hori(int x, int y, int w, int h, struct COLOR_RGB c0, struc
 	for (int i = 0; i < h; ++i) {
 		for (int j = 0; j < w; ++j) {
 			c = color_shift(c0, c1, w, j);
+			paint_point(x + i, y + j, c);
+		}
+	}
+}
+
+
+void paint_rect_dclr_vert(int x, int y, int w, int h, struct COLOR_RGB c0, struct COLOR_RGB c1) {  // double colors, horizonal
+	COLOR c;
+	for (int j = 0; j < w; ++j) {
+		for (int i = 0; i < h; ++i) {
+			c = color_shift(c0, c1, h, i);
 			paint_point(x + i, y + j, c);
 		}
 	}
